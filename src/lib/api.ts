@@ -281,11 +281,12 @@ export interface Payment {
 
 export const financeApi = {
   // Acceptance-fee flow (used by the admissions page)
-  initAcceptanceFee: (applicationId: string, amount: number, redirectUrl?: string) =>
+  initAcceptanceFee: (applicationId: string, amount: number, redirectUrl?: string, gateway?: string) =>
     api.post<InitPaymentResult>('/finance/payments/init', {
       applicationId,
       amount,
       redirectUrl,
+      gateway,
     }),
   verify: (reference: string) =>
     api.post<{ id: string; status: string }>('/finance/payments/verify', { reference }),
