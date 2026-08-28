@@ -680,6 +680,16 @@ export const staffApi = {
     api.patch<StaffRecord>(`/staff/${id}`, payload),
   remove: (id: string) => request<{ deleted: boolean }>(`/staff/${id}`, { method: 'DELETE' }),
   toggleActive: (id: string) => api.patch<StaffRecord>(`/staff/${id}/toggle-active`),
+  pendingApprovals: () =>
+    api.get<{
+      id: string;
+      firstName: string;
+      lastName: string;
+      staffNumber: string | null;
+      department?: { name: string };
+      user?: { id: string; email: string; firstName: string; lastName: string; createdAt: string };
+    }[]>('/staff/pending-approvals'),
+  approvePortal: (id: string) => api.patch<{ success: boolean }>(`/staff/${id}/approve-portal`),
 };
 
 // ---- Academics (faculties / departments / programmes / courses) ----
