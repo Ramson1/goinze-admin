@@ -896,6 +896,20 @@ export const communicationApi = {
   }) => api.patch<AnnouncementRecord>(`/communication/announcements/${id}`, payload),
   deleteAnnouncement: (id: string) =>
     api.delete<{ success: boolean }>(`/communication/announcements/${id}`),
+
+  // ---- Bulk Email (Email Blast) ----
+  previewEmailBlast: (payload: { groups: string[]; specificUserIds?: string[] }) =>
+    api.post<{ id: string; email: string; name: string }[]>('/communication/email-blast/preview', payload),
+  sendEmailBlast: (payload: {
+    subject: string;
+    body: string;
+    groups: string[];
+    specificUserIds?: string[];
+  }) =>
+    api.post<{ sent: number; failed: number; total: number; message?: string }>(
+      '/communication/email-blast',
+      payload,
+    ),
 };
 
 // ---- News ----
@@ -1016,6 +1030,60 @@ export const reportsApi = {
   payments: () => api.get<PaymentsReport>('/reports/payments'),
   results: () => api.get<ResultsReport>('/reports/results'),
   attendance: () => api.get<AttendanceReport>('/reports/attendance'),
+};
+
+// ---- Attendance ----
+
+export interface AttendanceSessionSummary {
+  courseId: string;
+  courseCode: string;
+  courseTitle: string;
+  lecturers: string[];
+  date: string;
+  totalMarked: number;
+  presentCount: number;
+  absentCount: number;
+  lateCount: number;
+  methods: string[];
+}
+
+export interface AttendanceSessionRecord {
+  id: string;
+  studentId: string | null;
+  firstName: string;
+  lastName: string;
+  matricNumber: string | null;
+  status: string;
+  method: string;
+  date: string;
+  overallAttendance: {
+    present: number;
+    absent: number;
+    late: number;
+    total: number;
+    rate: number;
+  };
+}
+
+export const attendanceApi = {
+  overview: (courseId?: string) =>
+    api.get<AttendanceSessionSummary[]>(
+      `/attendance/overview${courseId ? `?courseId=${encodeURIComponent(courseId)}` : ''}`,
+    ),
+  sessionDetail: (courseId: string, date: string) =>
+    api.get<AttendanceSessionRecord[]>(
+      `/attendance/session/${encodeURIComponent(courseId)}/${encodeURIComponent(date)}`,
+    ),
+  studentReport: (studentId: string) =>
+    api.get<{
+      studentId: string;
+      total: number;
+      PRESENT: number;
+      ABSENT: number;
+      LATE: number;
+      EXCUSED: number;
+      attendanceRate: number;
+    }>(`/attendance/report/${encodeURIComponent(studentId)}`),
 };
 
 // ---- CBT ----
